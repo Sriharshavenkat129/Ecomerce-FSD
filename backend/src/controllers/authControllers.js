@@ -3,6 +3,7 @@ const pool = require('../config/db.js')
 const bcrypt=require('bcryptjs')
 const jwt=require('jsonwebtoken')
 const mailer=require('../config/nodemailer.js')
+const { ref } = require('node:process')
 
 const login=async (req,res,next)=>{
     const {email,password}=req.body
@@ -23,6 +24,7 @@ const login=async (req,res,next)=>{
         const refreshToken=jwt.sign(user,process.env.JWT_SECRET,{expiresIn:"10days"})
         res.status(200).json({"status":200,
             "msg":"login success",
+            "userType":user.role,
             "accessToken":accessToken,
             "refreshToken":refreshToken})   
     }
@@ -72,7 +74,6 @@ const verifyRegistration=async (req,res,next)=>{
     const otpToken=token.split(" ")[1]
     try{
         const data=jwt.verify(otpToken,process.env.JWT_SECRET)
-        console.log(data)
         if(data.otp!=otp)
             return next({"status":401,"msg":"otp verification failed"})
         const hashed_pass=await bcrypt.hash(data.password,10)
@@ -93,8 +94,27 @@ const verifyRegistration=async (req,res,next)=>{
         })
     }
     catch(error){
-        next({"status":"403","msg":"otp exipred!"})
+        next({"status":"401","msg":"otp exipred!"})
     }
 }
 
-module.exports={login,register,verifyRegistration}
+const getAccesstoken=(req,res,next)=>{
+    const {refreshToken}=req.body
+    if(!refreshToken)
+        next({"status":400,"msg":"refresh token required!"})
+    try{
+        const token=refreshToken.split(" ")[1]
+        const data=jwt.verify(token,process.env.JWT_SECRET)
+        const user={
+            user_id:data.user_id,
+            role:data.role
+        }
+        const accessToken=jwt.sign(user,process.env.JWT_SECRET,{expiresIn:"1h"})
+        res.status(200).json({"status":200,"msg":"token generated","accessToken":accessToken})
+    }
+    catch(error){
+        next({"status":401,"msg":"Authentication failed"})
+    }
+}
+
+module.exports={login,register,verifyRegistration,getAccesstoken}
