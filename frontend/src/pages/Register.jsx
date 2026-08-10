@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router"
 import { toast } from "react-hot-toast"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import app from "../utils/app"
 
@@ -10,22 +10,32 @@ export default function Register() {
         "email": "",
         "password": ""
     })
-    const navigate=useNavigate()
+    const navigate = useNavigate()
     const [otpSent, setOtpSent] = useState(false)
     const [showPass, setShowPass] = useState(false)
     const [otp, setOtp] = useState("")
+    const [otpTimer, setOtpTimer] = useState(0);
 
     const hasDigit = /[0-9]/.test(data.password)
     const hasCap = /[A-Z]/.test(data.password)
     const hasSmall = /[a-z]/.test(data.password)
     const isValidPassword = hasCap && hasDigit && hasSmall
 
+    useEffect(() => {
+        if (otpTimer > 0) {
+            const time = setTimeout(() => {
+                setOtpTimer(pre => pre - 1)
+            }, 1000)
+            return () => clearTimeout(time)
+        }
+    }, [otpTimer])
+
     const handleSubmit = async (e) => {
         if (e)
             e.preventDefault()
         console.log(data)
-        if(data.password.length<8 || isValidPassword==false){
-            toast.success("password doesn`t met the requirements!")
+        if (data.password.length < 8 || isValidPassword == false) {
+            toast.error("password doesn`t met the requirements!")
             return;
         }
         try {
@@ -33,9 +43,10 @@ export default function Register() {
             localStorage.setItem('otpToken', result.data.otpToken)
             toast.success(result.data.msg)
             setOtpSent(true)
+            setOtpTimer(60)
         }
         catch (error) {
-            if(error.response.status==500)navigate('/ServerError')
+            if (error.response.status == 500) navigate('/ServerError')
             toast.error(error.response.data.msg)
         }
     }
@@ -43,25 +54,27 @@ export default function Register() {
     const handleOTP = async (e) => {
         e.preventDefault()
         try {
-            const token=localStorage.getItem('otpToken')
-            const result = await app.post("/verify", 
-                {"otp":otp},
-            {headers:{
-                Authorization:`Bearer ${token}`   
-            }}
+            const token = localStorage.getItem('otpToken')
+            const result = await app.post("/verify",
+                { "otp": otp },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
             )
             localStorage.removeItem('otpToken')
-            localStorage.setItem('accessToken',result.data.accessToken)
-            localStorage.setItem('refreshToken',result.data.refreshToken)
+            localStorage.setItem('accessToken', result.data.accessToken)
+            localStorage.setItem('refreshToken', result.data.refreshToken)
             toast.success(result.data.msg)
             navigate("/Home")
 
         }
-        catch(error){
-            if(error.response.status==500)navigate("/ServerError")
+        catch (error) {
+            if (error.response.status == 500) navigate("/ServerError")
             toast.error(error.response.data.msg)
         }
-}
+    }
 
     const resendOTP = () => {
         handleSubmit()
@@ -120,7 +133,11 @@ export default function Register() {
                             <button type="submit">Verify</button>
                         </form>
                         <div>
-                            <p>Having trouble<span onClick={() => { resendOTP() }}>resend</span></p>
+                            <p>{otpTimer == 0 ? "resend otp" : `you can send otp in ${otpTimer}sec`}
+                                {otpTimer == 0 &&
+                                    <span onClick={() => { resendOTP() }}>resend</span>
+                                }
+                            </p>
                         </div>
                     </div>
                 </div>
