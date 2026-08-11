@@ -22,3 +22,5 @@ const adminAuth=(req,res,next)=>{
     if(req.user.role=='admin')next()
     else next({"status":403,"msg":"Unauthorized action!"})
 }
+
+module.exports={userAuth,adminAuth}
