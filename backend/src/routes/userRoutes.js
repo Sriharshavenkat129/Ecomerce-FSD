@@ -1,22 +1,14 @@
 const router=require('express').Router()
 const {userAuth}=require('../middlewares/authMiddlewares')
+const {getAllProducts,getProductById,getProductByCategory,getProductsByQuery}=require("../controllers/productControllers")
 
+router.get('/',userAuth,getAllProducts)
 
-router.get('/',userAuth,(req,res)=>{
-    res.send("all products!")
-})
+router.get('/products/:category',userAuth,getProductByCategory)
 
-router.get('/products/:category',userAuth,(req,res)=>{
-    res.send("product by category")
-})
+router.get('/products',userAuth,getProductsByQuery)
 
-router.get('/products',userAuth,(req,res)=>{
-    res.send("product based on search")
-})
-
-router.get('/products/:id',userAuth,(req,res)=>{
-    res.send('products based on id')
-})
+router.get('/product/:id',userAuth,getProductById)
 
 router.post('/products/order',userAuth,(req,res)=>{
     res.send("order the product")
