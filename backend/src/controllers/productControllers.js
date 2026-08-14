@@ -62,7 +62,7 @@ const getProductsByQuery=async (req,res,next)=>{
     }
     if(query.maxPrice){
         queries.push(`price<=$${count}`)
-        values.push(count)
+        values.push(query.maxPrice)
         count++;
     }
     try{
@@ -109,6 +109,7 @@ const updateProduct=async (req,res,next)=>{
             count++;
         }
     }
+    if(values.length==0) return next({"status":200,"msg":"nothing to update!"})
     const product_id=data.product_id
     values.push(product_id)
     try{
