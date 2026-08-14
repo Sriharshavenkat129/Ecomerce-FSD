@@ -19,9 +19,9 @@ const getAllProducts=async (req,res,next)=>{
 }
 
 const getProductById=async (req,res,next)=>{
-    const id=req.params.id
+    const product_id=req.params.product_id
     try{
-        const result=await pool.query("select * from products where product_id=$1",[id])
+        const result=await pool.query("select * from products where product_id=$1",[product_id])
         if(result.rows.length==0)
             return next({"status":404,"msg":"product not found"})
         res.status(200).json({"msg":"product fetched success","data":result.rows[0]})
@@ -101,7 +101,7 @@ const updateProduct=async (req,res,next)=>{
     let values=[]
     let queries=[]
     let count=1
-    const allowedFields=['product_name','product_description','price','stock','category','isAvailable']
+    const allowedFields=['product_name','product_description','price','stock','category','is_available']
     for(const field of allowedFields){
         if(data[field]!=undefined){
             values.push(data[field])
@@ -123,9 +123,9 @@ const updateProduct=async (req,res,next)=>{
 }
 
 const deleteProduct=async (req,res,next)=>{
-    const id=req.params.id
+    const product_id=req.params.product_id
     try{
-        const result=await pool.query("update products set is_available=$1 where product_id=$2",[false,id])
+        const result=await pool.query("update products set is_available=$1 where product_id=$2",[false,product_id])
         res.status(200).json({"msg":"product removed from the store"})
     }
     catch(error){

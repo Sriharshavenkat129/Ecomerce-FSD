@@ -103,8 +103,7 @@ const getAccesstoken=(req,res,next)=>{
     if(!refreshToken)
         next({"status":400,"msg":"refresh token required!"})
     try{
-        const token=refreshToken.split(" ")[1]
-        const data=jwt.verify(token,process.env.JWT_SECRET)
+        const data=jwt.verify(refreshToken,process.env.JWT_SECRET)
         const user={
             user_id:data.user_id,
             role:data.role
