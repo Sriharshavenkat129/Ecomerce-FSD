@@ -4,8 +4,7 @@ const {userAuth}=require('../middlewares/authMiddlewares')
 const {getAllProducts,getProductById,getProductByCategory,getProductsByQuery}=require("../controllers/productControllers")
 //order related controllers
 const {placeOrder, getUserOrders,getUserOrderById,cancelOrder,returnOrder,payNow}=require("../controllers/orderControllers")
-//cart related controllers
-const {addProductIntoCart,getAllCartedProducts,removeCartedProduct,orderAllFromCart}=require("../controllers/cartControllers")
+
 
 router.get('/',userAuth,getAllProducts)
 
@@ -27,13 +26,21 @@ router.post("/me/orders/return",userAuth,returnOrder)
 
 router.patch('/me/orders/paynow',userAuth,payNow)
 
-router.post('/products/cart',userAuth,addProductIntoCart)
+router.post('/products/cart',userAuth,(req,res)=>{
+    res.send("add product into cart")
+})
 
-router.get('/me/cart',userAuth,getAllCartedProducts)
+router.get('/me/cart',userAuth,(req,res)=>{
+    res.send('all carted products')
+})
 
-router.delete('/me/cart/:cart_id',userAuth,removeCartedProduct)
+router.patch('/me/cart',userAuth,(req,res)=>{
+    res.send('remove product from cart')
+})
 
-router.post('/me/cart/order',userAuth,orderAllFromCart)
+router.post('/me/cart/order',userAuth,(req,res)=>{
+    res.send('order all from cart')
+})
 
 router.get('/me',userAuth,(req,res)=>{
     res.send('send user details')

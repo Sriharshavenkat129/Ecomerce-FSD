@@ -40,7 +40,7 @@ const register=async (req,res,next)=>{
     try{
         const check=await pool.query("select user_id from users where email=$1",[email])
         if(check.rows.length>0)
-            return next({"status":409,"msg":"email already registered!"})
+            return next({"status":400,"msg":"email already registered!"})
         const otp=Math.floor(100000+Math.random()*900000).toString()
         const user={
             name,
