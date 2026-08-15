@@ -38,7 +38,7 @@ const removeCartedProduct=async (req,res,next)=>{
         res.status(200).json({"msg":'product removed form the cart'})
     }
     catch(error){
-        next({"status":500,"msg":"some"})
+        next({"status":500,"msg":"failed to remove the product"})
     }
 }
 
