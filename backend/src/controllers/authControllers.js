@@ -4,6 +4,7 @@ const bcrypt=require('bcryptjs')
 const jwt=require('jsonwebtoken')
 const mailer=require('../config/nodemailer.js')
 const { ref } = require('node:process')
+const { stat } = require('node:fs')
 
 const login=async (req,res,next)=>{
     const {email,password}=req.body
@@ -116,4 +117,59 @@ const getAccesstoken=(req,res,next)=>{
     }
 }
 
-module.exports={login,register,verifyRegistration,getAccesstoken}
+const sendPassWordResetOtp=async (req,res,next)=>{
+    const {email}=req.body
+    try{
+        const result=await pool.query("select * from users where email=$1 for update",[email])
+        if(result.rows.length==0){
+            return next({"status":404,"msg":"user not found with this email"})
+        }
+        const otp=Math.floor(100000+Math.random()*900000).toString()
+        const otpToken=await jwt.sign({"user_id":result.rows[0].user_id,"otp":otp},
+            process.env.JWT_SECRET,{expiresIn:"5m"}
+        )
+        mailer.sendMail({
+            from:process.env.EMAIL_USER,
+            to:email,
+            subject:"you otp for reseting your password",
+            text:`do not share this otp to anyone \n your one time password : ${otp} \n this is validate for only 5 minutes`
+        })
+        res.status(200).json({"msg":"otp send to the mail","otpToken":otpToken})
+    }
+    catch(error){
+        next({"status":500,"msg":"unable to send otp"})
+    }
+}
+
+const verifyPassWordResetOtp=async (req,res,next)=>{
+    const {otp,otpToken }=req.body
+    if(!otp)
+        return next({"status":400,"msg":"otp required"})
+    if(!otpToken)
+        return next({"status":400,"msg":"otp token required"})
+    if(otp.length!=6)
+        return next({"status":400,"msg":"enter a valid 6 digit otp"})
+    try{
+        const data=jwt.verify(otpToken,process.env.JWT_SECRET)
+        if(data.otp!=otp)
+            return next({"status":401,"msg":"incorret otp"})
+        res.status(200).json({"msg":"otp verified","user_id":data.user_id})
+    }
+    catch(error){
+        next({"status":401,"msg":"otp verification failed!"})
+    }
+}
+
+const resetPassword=async (req,res,next)=>{
+    const {user_id,new_password}=req.body
+    try{
+        const newHashedPassword=await bcrypt.hash(new_password,10)
+        await pool.query("update users set password=$1 where user_id=$2",[newHashedPassword,user_id])
+        res.status(200).json({"msg":"password updated successfully"})
+    }
+    catch(error){
+        next({"status":401,"msg":"password updation failed"})
+    }
+}
+
+module.exports={login,register,verifyRegistration,getAccesstoken,sendPassWordResetOtp,verifyPassWordResetOtp,resetPassword}

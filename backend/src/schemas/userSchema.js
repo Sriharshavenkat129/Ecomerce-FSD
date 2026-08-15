@@ -16,7 +16,7 @@ const loginSchema=z.object({
 })
 
 const passwordSchema=z.object({
-    old_password:z.string("password is required"),
+    old_password:z.string("your old password is required"),
     new_password:z.string("new password cannot be empty")
     .min(8,"password is too short")
     .regex(/[a-z]/,"password must contains one small letter")
@@ -34,4 +34,16 @@ const addressSchema=z.object({
     .min(3,"enter proper state name")
 })
 
-module.exports={registerSchema,loginSchema,passwordSchema,addressSchema}
+const emailValidator=z.object({
+    email:z.string("email is required").email("enter a valid email")
+})
+
+const passwordValidator=z.object({
+    new_password:z.string("password is required")
+    .min(8,"password is too short")
+    .regex(/[a-z]/,"password must contain one small letter")
+    .regex(/[A-Z]/,"password must contain one capital letter")
+    .regex(/[0-9]/,"password must contain a digit")
+})
+
+module.exports={registerSchema,loginSchema,passwordSchema,addressSchema,emailValidator,passwordValidator}

@@ -7,7 +7,7 @@ const getUserDetails=async (req,res,next)=>{
         res.status(200).json({"msg":"user data fetched","data":result.row[0]})
     }
     catch(error){
-        next({"status":500,"msg":"unable to fddetch user details"})
+        next({"status":500,"msg":"unable to fetch user details"})
     }
 }
 
