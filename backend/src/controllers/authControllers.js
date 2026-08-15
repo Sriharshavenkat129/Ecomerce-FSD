@@ -153,7 +153,7 @@ const verifyPassWordResetOtp=async (req,res,next)=>{
         const data=jwt.verify(otpToken,process.env.JWT_SECRET)
         if(data.otp!=otp)
             return next({"status":401,"msg":"incorret otp"})
-        res.status(200).json({"msg":"otp verified","user_id":data.user_id})
+        res.status(200).json({"msg":"otp verified","otpToken":otpToken})
     }
     catch(error){
         next({"status":401,"msg":"otp verification failed!"})
@@ -161,10 +161,11 @@ const verifyPassWordResetOtp=async (req,res,next)=>{
 }
 
 const resetPassword=async (req,res,next)=>{
-    const {user_id,new_password}=req.body
+    const {otpToken,new_password}=req.body
     try{
+        const data=await jwt.verify(otpToken,process.env.JWT_SECRET)
         const newHashedPassword=await bcrypt.hash(new_password,10)
-        await pool.query("update users set password=$1 where user_id=$2",[newHashedPassword,user_id])
+        await pool.query("update users set password=$1 where user_id=$2",[newHashedPassword,data.user_id])
         res.status(200).json({"msg":"password updated successfully"})
     }
     catch(error){

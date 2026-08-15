@@ -82,7 +82,7 @@ const getUserOrderById=async (req,res,next)=>{
             where o.order_id=$1 and o.user_id=$2',[order_id,req.user.user_id])
         if(result.rows.length==0)
             return next({"status":400,"msg":"no order with this id!"})
-        res.status(200).json({"msg":"order details fetched successfully","data":result.rows})
+        res.status(200).json({"msg":"order details fetched successfully","data":result.rows[0]})
     }
     catch(error){
         next({"status":500,"msg":"something went wrong!"})
@@ -99,19 +99,19 @@ const cancelOrder=async (req,res,next)=>{
     try{
         con=await pool.connect()
         await con.query('begin')
-        const productResult=await con.query("select is_available,stock from products where product_id=$1 for update",[product_id])
+        const productResult=await con.query("select stock from products where product_id=$1 for update",[product_id])
         if(productResult.rows.length==0){
             await con.query('rollback')
             return next({"status":404,"msg":"product not found"})
         }
-        if(productResult.rows[0].is_available==false){
-            await con.query('rollback')
-            return next({"status":500,"msg":"unable to process cancellation for this product"})
-        }
-        const orderResult=await con.query('select quantity,unit_price,status from orders where order_id=$1',[order_id])
+        const orderResult=await con.query('select quantity,unit_price,status,user_id from orders where order_id=$1',[order_id])
         if(orderResult.rows.length==0){
             await con.query('rollback')
             return next({"status":404,"msg":"order not found!"})
+        }
+        if(orderResult.rows[0].user_id!=req.user.user_id){
+            await con.query("rollback")
+            return next({"status":403,"msg":"you cannot cancel others orders"})
         }
         if(orderResult.rows[0].quantity==0){
             await con.query('rollback')
@@ -119,7 +119,7 @@ const cancelOrder=async (req,res,next)=>{
         }
         if(orderResult.rows[0].status!="created"){
             await con.query('rollback')
-            return next({"status":500,"msg":"order not in process already!"})
+            return next({"status":500,"msg":"order not in process to cancel!"})
         }
         const transactionResult=await con.query("select payment_type,payment_status,total_amount from transactions where transaction_id=$1",[transaction_id])
         if(transactionResult.rows.length==0){
@@ -131,7 +131,7 @@ const cancelOrder=async (req,res,next)=>{
             return next({"status":500,"msg":"cancellation failed"})
         }
         if(quantity==orderResult.rows[0].quantity){
-            await con.query("update orders set status=$1 where order_id=$3",["cancelled",order_id])
+            await con.query("update orders set status=$1 where order_id=$2",["cancelled",order_id])
             await con.query("update products set stock=$1 where product_id=$2",[productResult.rows[0].stock+quantity,product_id])
             if(transactionResult.rows[0].payment_status=="pending")
                 await con.query('update transactions set payment_status=$1 where transaction_id=$2',["cancelled",transaction_id])
@@ -141,9 +141,9 @@ const cancelOrder=async (req,res,next)=>{
         else{
             await con.query("update products set stock=$1 where product_id=$2",
                 [productResult.rows[0].stock+quantity,product_id])
+            await con.query("update orders set quantity=$1 where order_id=$2",
+                [orderResult.rows[0].quantity-quantity,order_id])
             if(transactionResult.rows[0].payment_status=='pending'){
-                await con.query("update orders set quantity=$1 where order_id=$2",
-                    [orderResult.rows[0].quantity-quantity,order_id])
                 await con.query("update transactions set total_amount=$1 where transaction_id=$2",
                     [transactionResult.rows[0].total_amount-(quantity*orderResult.rows[0].unit_price),transaction_id])
             }
@@ -183,10 +183,22 @@ const returnOrder=async (req,res,next)=>{
     try{
         con=await pool.connect()
         await con.query('begin')
-        const result=await con.query("select quantity,unit_price,address_id,product_id from orders where order_id=$1 for update",[order_id])
+        const result=await con.query("select quantity,unit_price,address_id,product_id,user_id,status from orders where order_id=$1 for update",[order_id])
         if(result.rows.length==0){
             await con.query('rollback')
             return next({"status":404,"msg":"cannot find the order"})
+        }
+        if(req.user.user_id!=result.rows[0].user_id){
+            await con.query('rollback')
+            return next({"status":403,"msg":'you cannot return others orders'})
+        }
+        if(quantity>result.rows[0].quantity){
+            await con.query('rollback')
+            return next({"status":500,"msg":"you did`t ordered  that many products to return!"})
+        }
+        if(result.rows[0].status!="delivered"){
+            await con.query("rollback")
+            return next({"status":500,"msg":"you cannot return this order"})
         }
         const amount=result.rows[0].unit_price*quantity
         const transactionDetails=await con.query('insert into transactions (payment_type,payment_status,total_amount)\
@@ -197,11 +209,7 @@ const returnOrder=async (req,res,next)=>{
             await con.query('insert into orders (user_id,product_id,address_id,quantity,status,transaction_id,unit_price)\
                 values($1,$2,$3,$4,$5,$6,$7)',[req.user.user_id,result.rows[0].product_id,result.rows[0].address_id,quantity,
             "returned",transactionDetails.rows[0].transaction_id,result.rows[0].unit_price])
-            await con.query('update orders set quantity=$1 where order_id=$2',[result.rows[0].quantity-quantity,order_id])
-        if(quantity>result.rows[0].quantity){
-            await con.query('rollback')
-            return next({"status":500,"msg":"you did`t ordered  that many products to return!"})
-        }
+        if(quantity<result.rows[0].quantity)await con.query('update orders set quantity=$1 where order_id=$2',[result.rows[0].quantity-quantity,order_id])
         await con.query('commit')
         res.status(200).json("order returned successfully")
     }
@@ -224,11 +232,15 @@ const payNow=async (req,res,next)=>{
     try{
         con=await pool.connect()
         await con.query('begin')
-        const result=await con.query("select o.transaction_id,o.status,t.payment_status from orders o left join\
+        const result=await con.query("select o.transaction_id,o.user_id,o.status,t.payment_status from orders o left join\
             transactions t on o.transaction_id=t.transaction_id where o.order_id=$1",[order_id])
-        if(result.rows[0].length==0){
+        if(result.rows.length==0){
             await con.query('rollback')
             return next({"status":404,"msg":"order not found with provided order_id"})
+        }
+        if(result.rows[0].user_id!=req.user.user_id){
+            await con.query('rollback')
+            return next({"status":403,"msg":"do you really wanna pay for others. I won`t allow it "})
         }
         if(result.rows[0].status!="created"){
             await con.query('rollback')
@@ -247,7 +259,7 @@ const payNow=async (req,res,next)=>{
     catch(error){
         if(con)
             await con.query('rollback')
-        res.status({"status":500,"msg":"payment failed!"})
+            next({"status":500,"msg":"payment failed!"})
     }
     finally{
         if(con)
@@ -283,7 +295,7 @@ const getOrderById=async (req,res,next)=>{
             where o.order_id=$1",[order_id])
         if(result.rows.length==0)
             return next({'status':404,"msg":"order not found!"})
-        res.status(200).json({'msg':"order details fetched successfully","data":result.rows})
+        res.status(200).json({'msg':"order details fetched successfully","data":result.rows[0]})
     }
     catch(error){
         next({"status":500,"msg":"unable to fetch details"})
