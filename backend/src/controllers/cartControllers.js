@@ -54,6 +54,10 @@ const orderAllFromCart=async (req,res,next)=>{
         for(const cartedProduct of cartedProducts){
             try{
                 const {cart_id,product_id,quantity}=cartedProduct
+                if(quantity<=0){
+                    await con.query('rollback')
+                    return next({"status":400,"msg":"qunatity alteast be one"})
+                }
                 const cart=await con.query("select * from carts where cart_id=$1",[cart_id])
                 if(cart.rows.length==0){
                     await con.query('rollback')

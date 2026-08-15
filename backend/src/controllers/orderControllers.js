@@ -7,6 +7,8 @@ const placeOrder=async (req,res,next)=>{
     let con;
     if(!product_id || !quantity || !payment_type || !address_id)
         return next({"status":400,"msg":"incomplete details!"})
+    if(quantity<=0)
+        return next({"status":400,"msg":"unable to order for this quantity"})
     try{
         con=await pool.connect()
         await con.query("begin")
@@ -91,6 +93,8 @@ const cancelOrder=async (req,res,next)=>{
     const {product_id,order_id,transaction_id,quantity}=req.body
     if(!order_id)
         return next({"status":400,"msg":"order id required!"})
+    if(quantity<=0)
+        return next({"status":400,"msg":"unable to process with this quantity"})
     let con;
     try{
         con=await pool.connect()
@@ -173,6 +177,8 @@ const cancelOrder=async (req,res,next)=>{
 
 const returnOrder=async (req,res,next)=>{
     const {order_id,quantity}=req.body
+    if(quantity<=0)
+        return next({"status":400,"msg":"unableto process with this quantity"})
     let con;
     try{
         con=await pool.connect()
@@ -218,7 +224,8 @@ const payNow=async (req,res,next)=>{
     try{
         con=await pool.connect()
         await con.query('begin')
-        const result=await con.query("select transaction_id,status from orders where order_id=$1 for update",[order_id])
+        const result=await con.query("select o.transaction_id,o.status,t.payment_status from orders o left join\
+            transactions t on o.transaction_id=t.transaction_id where o.order_id=$1",[order_id])
         if(result.rows[0].length==0){
             await con.query('rollback')
             return next({"status":404,"msg":"order not found with provided order_id"})
