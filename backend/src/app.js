@@ -5,13 +5,15 @@ const globalMiddleware=require("./middlewares/globalMiddleware.js")
 const userRouter=require("./routes/userRoutes.js")
 const adminRouter=require("./routes/adminRouter.js")
 const {userAuth,adminAuth}=require("./middlewares/authMiddlewares.js")
+const {authLimiter,generalLimiter}=require("./middlewares/rateLimiters.js")
 
 const app=express()
 
 app.use(express.json())
 app.use(cors())
+app.use(generalLimiter)
 
-app.use("/api/v1",authRouter)
+app.use("/api/v1",authLimiter,authRouter)
 app.use("/api/v1/user",userAuth,userRouter)
 app.use("/api/v1/admin",userAuth,adminAuth,adminRouter)
 
