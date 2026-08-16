@@ -1,5 +1,4 @@
 const router=require('express').Router()
-const {userAuth}=require('../middlewares/authMiddlewares')
 const {passwordSchema,addressSchema}=require("../schemas/userSchema")
 const {placeOrderSchema,cancelOrderSchema,returnOrderSchema}=require("../schemas/orderSchema")
 const validate=require("../middlewares/validationMiddleware")
@@ -12,39 +11,39 @@ const {addProductIntoCart,getAllCartedProducts,removeCartedProduct,orderAllFromC
 //user related controllers 
 const {getUserDetails,updateUserPassWord, addAddress}=require("../controllers/userControllers")
 
-router.get('/',userAuth,getAllProducts)
+router.get('/',getAllProducts)
 
-router.get('/products/:category',userAuth,getProductByCategory)
+router.get('/products/:category',getProductByCategory)
 
-router.get('/products',userAuth,getProductsByQuery)
+router.get('/products',getProductsByQuery)
 
-router.get('/product/:product_id',userAuth,getProductById)
+router.get('/product/:product_id',getProductById)
 
-router.post('/products/order',userAuth,validate(placeOrderSchema),placeOrder)
+router.post('/products/order',validate(placeOrderSchema),placeOrder)
 
-router.get('/me/orders',userAuth,getUserOrders)
+router.get('/me/orders',getUserOrders)
 
-router.get('/me/orders/:order_id',userAuth,getUserOrderById)
+router.get('/me/orders/:order_id',getUserOrderById)
 
-router.patch('/me/orders/cancel',userAuth,validate(cancelOrderSchema),cancelOrder)
+router.patch('/me/orders/cancel',validate(cancelOrderSchema),cancelOrder)
 
-router.post("/me/orders/return",userAuth,validate(returnOrderSchema),returnOrder)
+router.post("/me/orders/return",validate(returnOrderSchema),returnOrder)
 
-router.patch('/me/orders/paynow',userAuth,payNow)
+router.patch('/me/orders/paynow',payNow)
 
-router.post('/products/cart',userAuth,addProductIntoCart)
+router.post('/products/cart',addProductIntoCart)
 
-router.get('/me/cart',userAuth,getAllCartedProducts)
+router.get('/me/cart',getAllCartedProducts)
 
-router.delete('/me/cart/:cart_id',userAuth,removeCartedProduct)
+router.delete('/me/cart/:cart_id',removeCartedProduct)
 
-router.post('/me/cart/order',userAuth,orderAllFromCart)
+router.post('/me/cart/order',orderAllFromCart)
 
-router.get('/me',userAuth,getUserDetails)
+router.get('/me',getUserDetails)
 
-router.patch('/me',userAuth,validate(passwordSchema),updateUserPassWord)
+router.patch('/me',validate(passwordSchema),updateUserPassWord)
 
 
-router.post('/me/address',userAuth,validate(addressSchema),addAddress)
+router.post('/me/address',validate(addressSchema),addAddress)
 
 module.exports=router

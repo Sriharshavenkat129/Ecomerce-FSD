@@ -4,6 +4,7 @@ const authRouter=require('./routes/authrouter.js')
 const globalMiddleware=require("./middlewares/globalMiddleware.js")
 const userRouter=require("./routes/userRoutes.js")
 const adminRouter=require("./routes/adminRouter.js")
+const {userAuth,adminAuth}=require("./middlewares/authMiddlewares.js")
 
 const app=express()
 
@@ -11,8 +12,8 @@ app.use(express.json())
 app.use(cors())
 
 app.use("/api/v1",authRouter)
-app.use("/api/v1/user",userRouter)
-app.use("/api/v1/admin",adminRouter)
+app.use("/api/v1/user",userAuth,userRouter)
+app.use("/api/v1/admin",userAuth,adminAuth,adminRouter)
 
 app.use(globalMiddleware)
 
