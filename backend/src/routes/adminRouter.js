@@ -5,6 +5,8 @@ const {getAllProducts,getProductById,addProduct,updateProduct,deleteProduct}=req
 const {getAllOrders,getOrderById,completeOrder} =require("../controllers/orderControllers")
 //admin controler for dashboard
 const {getReport} = require("../controllers/adminControllers") 
+//mutler and cloudinary for adding product
+const upload=require("../middlewares/multerMiddleware")
 
 router.get('/',getReport)
 
@@ -12,7 +14,7 @@ router.get('/products',getAllProducts)
 
 router.get('/products/:product_id',getProductById)
 
-router.post('/products',addProduct)
+router.post('/products',upload.single('product_image'),addProduct)
 
 router.patch('/products',updateProduct)
 

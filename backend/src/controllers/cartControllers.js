@@ -1,3 +1,4 @@
+const { error } = require("node:console")
 const pool=require("../config/db")
 
 const addProductIntoCart=async (req,res,next)=>{
@@ -54,6 +55,10 @@ const orderAllFromCart=async (req,res,next)=>{
         for(const cartedProduct of cartedProducts){
             try{
                 const {cart_id,product_id,quantity}=cartedProduct
+                if(!cart_id || !product_id ||!quantity){
+                    con.query('rollback')
+                    return next({"status":400,"msg":"product_id ,cart_id and quantity are required!"})
+                }
                 if(quantity<=0){
                     await con.query('rollback')
                     return next({"status":400,"msg":"qunatity alteast be one"})
@@ -78,14 +83,14 @@ const orderAllFromCart=async (req,res,next)=>{
                 )
                 const transaction_details=await con.query("insert into transactions (payment_type,total_amount,payment_status)\
                     values($1,$2,$3) returning transaction_id",[payment_type,product_details.rows[0].price*quantity,status])
-                if(transaction_details.rows.length==0){
-                    await con.query('rollback')
-                    return next({"status":500,"msg":"order not placed!"})
-                }
-                await con.query("insert into orders (user_id,product_id,address_id,quantity,transaction_id,unit_price)\
-                    values($1,$2,$3,$4,$5,$6)",[req.user.user_id,product_id,address_id,quantity,
-                        transaction_details.rows[0].transaction_id,product.price])
-                }
+                    if(transaction_details.rows.length==0){
+                        await con.query('rollback')
+                        return next({"status":500,"msg":"order not placed!"})
+                    }
+                    await con.query("insert into orders (user_id,product_id,address_id,quantity,transaction_id,unit_price)\
+                        values($1,$2,$3,$4,$5,$6)",[req.user.user_id,product_id,address_id,quantity,
+                            transaction_details.rows[0].transaction_id,product.price])
+                        }
                 catch(error){
                     throw new Error("unable to process the order")
                 }

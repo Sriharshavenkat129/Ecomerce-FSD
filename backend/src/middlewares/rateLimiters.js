@@ -6,7 +6,7 @@ const authLimiter=rateLimit({
 })
 
 const generalLimiter=rateLimit({
-    window:15*60*1000,
+    windowMs:15*60*1000,
     max:100
 })
 

@@ -3,7 +3,7 @@ const {z, number}=require('zod')
 const placeOrderSchema=z.object({
     product_id:z.string("product_id is required")
     .min(10),
-    quantity:z.number().int().min(1,"quantity must be greater than 0"),
+    quantity:z.number("quantity is required").int().min(1,"quantity must be greater than 0"),
     payment_type:z.enum(["upi","cod"],{
         errorMap: () => ({ message: "Only upi,cod are accepted" })
     }),

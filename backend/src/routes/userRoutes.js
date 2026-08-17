@@ -39,9 +39,9 @@ router.delete('/me/cart/:cart_id',removeCartedProduct)
 
 router.post('/me/cart/order',orderAllFromCart)
 
-router.get('/me',getUserDetails)
+router.get('/me/profile',getUserDetails)
 
-router.patch('/me',validate(passwordSchema),updateUserPassWord)
+router.patch('/me/profile',validate(passwordSchema),updateUserPassWord)
 
 
 router.post('/me/address',validate(addressSchema),addAddress)

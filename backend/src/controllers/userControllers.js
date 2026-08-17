@@ -4,7 +4,9 @@ const bcrypt =require("bcryptjs")
 const getUserDetails=async (req,res,next)=>{
     try{
         const result=await pool.query("select name,email from users where user_id=$1",[req.user.user_id])
-        res.status(200).json({"msg":"user data fetched","data":result.row[0]})
+        if(result.rows.length==0)
+            return next({"status":404,"msg":'user not found'})
+        res.status(200).json({"msg":"user data fetched","data":result.rows[0]})
     }
     catch(error){
         next({"status":500,"msg":"unable to fetch user details"})
