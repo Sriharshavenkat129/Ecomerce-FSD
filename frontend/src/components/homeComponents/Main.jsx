@@ -1,0 +1,20 @@
+export default function Main(){
+    return(
+        <main>
+            <section>
+                <button>
+                    electronics
+                </button>
+                <button>
+                    fashion
+                </button>
+                <button>
+                    groceris
+                </button>
+            </section>
+            <section>
+                <h2>products</h2>
+            </section>
+        </main>
+    )
+}
