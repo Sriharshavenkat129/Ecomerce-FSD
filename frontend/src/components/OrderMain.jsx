@@ -6,10 +6,12 @@ import { useParams } from "react-router";
 import ProductOrderCard from "./ProductOrderCard";
 import AddressRadio from "./addressRadio";
 import AddAddress from "./AddAddress";
+import OrderPlaced from "./orderPlaced";
 
 export default function OrderMain() {
     const [orderData, setOrderData] = useState({ "quantity": 1 })
     const [loading, setLoading] = useState(false);
+    const [timeout, setTimeOut] = useState(0)
     const [ordered, setOrdered] = useState(false);
     const [Addresses, setAddresses] = useState([]);
     const [addAddressStatus, setAddAddressStatus] = useState(false);
@@ -40,6 +42,20 @@ export default function OrderMain() {
         }
         getAddresses()
     }, [])
+
+    useEffect(() => {
+        let intervalId;
+
+        if (ordered === true && timeout > 0) {
+            intervalId = setInterval(() => {
+                setTimeOut(pre => pre - 1);
+            }, 1000);
+        } else if (ordered === true && timeout === 0) {
+            setOrdered(false);
+        }
+        return () => clearInterval(intervalId);
+    }, [ordered, timeout]);
+
     useEffect(() => {
         async function getProduct() {
             const product_id = useParams.product_id
@@ -61,6 +77,25 @@ export default function OrderMain() {
         }
         getProduct()
     }, [])
+
+    const handleOrder = async () => {
+        try {
+            setLoading(true)
+            if (!orderData.quantity || !orderData.payment_type || !orderData.address_id) {
+                toast.error("all details required!")
+                return
+            }
+            const response = await app.post("/user/products/order", { ...orderData, product_id: params.product_id })
+            setOrdered(true)
+            setTimeOut(5)
+        }
+        catch (error) {
+            toast.error(error.response.data.msg || "something went wrong!")
+        }
+        finally {
+            setLoading(false)
+        }
+    }
 
     const addressCards = Addresses.map(address => <AddressRadio key={address.address_id} address={address} setAddressId={setOrderData} />)
 
@@ -101,16 +136,14 @@ export default function OrderMain() {
                         </div>
                     </div>
                     <button className="bg-orange-400 p-2 rounded-2xl text-lg hover:rounded-3xl font-semibold hover:bg-orange-500
-                cursor-pointer transition-all duration-300 ease-in-out active:scale-99 active:bg-orange-400">
+                cursor-pointer transition-all duration-300 ease-in-out active:scale-99 active:bg-orange-400" onClick={() => handleOrder()}>
                         Place Order
                     </button>
                 </section>
             }
             {(!loading && ordered && !isRateLimited) &&
                 <section>
-                    <div>
-
-                    </div>
+                    <OrderPlaced />
                 </section>
             }
             {
@@ -123,7 +156,7 @@ export default function OrderMain() {
             }
             {
                 addAddressStatus &&
-                <AddAddress setAddAddressStatus={setAddAddressStatus} setAddresses={setAddresses} Addresses={Addresses}/>
+                <AddAddress setAddAddressStatus={setAddAddressStatus} setAddresses={setAddresses} Addresses={Addresses} />
             }
         </main>
     )
