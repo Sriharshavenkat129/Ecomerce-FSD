@@ -13,6 +13,18 @@ const getUserDetails=async (req,res,next)=>{
     }
 }
 
+const getUserAddresses=async (req,res,next)=>{
+    try{
+        const result=await pool.query("select address_id,location,pincode,state from addresses where user_id=$1",[req.user.user_id])
+        if(result.rows.length==0)
+            return next({"status":404,"msg":"user does not stored any addresses"})
+        res.status(200).json({"msg":"addresses fetched","data":result.rows})
+    }
+    catch(error){
+        next({"status":500,"msg":"something went wrong"})
+    }
+}
+
 const updateUserPassWord=async (req,res,next)=>{
     const {old_password,new_password}=req.body
     try{
@@ -33,7 +45,7 @@ const updateUserPassWord=async (req,res,next)=>{
 const addAddress=async (req,res,next)=>{
     const {location,pincode,state}=req.body
     try{
-        const result=await pool.query("insert into addresses (location,pincode,state,user_id) values($1,$2,$3,$4)"
+        const result=await pool.query("insert into addresses (location,pincode,state,user_id) values($1,$2,$3,$4) returning *"
             ,[location,pincode,state,req.user.user_id])
         res.status(200).json({"msg":"address added successfullt","data":result.rows[0]})
     }
@@ -43,4 +55,4 @@ const addAddress=async (req,res,next)=>{
     }
 }
 
-module.exports={getUserDetails,updateUserPassWord,addAddress}
+module.exports={getUserDetails,updateUserPassWord,addAddress,getUserAddresses}

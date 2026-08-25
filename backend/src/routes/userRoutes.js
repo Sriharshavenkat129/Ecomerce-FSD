@@ -9,7 +9,7 @@ const {placeOrder, getUserOrders,getUserOrderById,cancelOrder,returnOrder,payNow
 //cart related controllers
 const {addProductIntoCart,getAllCartedProducts,removeCartedProduct,orderAllFromCart}=require("../controllers/cartControllers")
 //user related controllers 
-const {getUserDetails,updateUserPassWord, addAddress}=require("../controllers/userControllers")
+const {getUserDetails,updateUserPassWord, addAddress, getUserAddresses}=require("../controllers/userControllers")
 
 router.get('/',getAllProducts)
 
@@ -43,6 +43,7 @@ router.get('/me/profile',getUserDetails)
 
 router.patch('/me/profile',validate(passwordSchema),updateUserPassWord)
 
+router.get("/me/address",getUserAddresses)
 
 router.post('/me/address',validate(addressSchema),addAddress)
 

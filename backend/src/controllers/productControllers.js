@@ -52,7 +52,7 @@ const getProductsByQuery=async (req,res,next)=>{
     let count=1
     if(query.product_name){
         queries.push(`(product_name ilike $${count} or product_description ilike $${count})`)
-        values.push(`${'%'+query.name+'%'}`)
+        values.push(`%${query.product_name}%`)
         count++;
     }
     if(query.minPrice){
