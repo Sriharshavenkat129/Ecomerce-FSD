@@ -52,7 +52,7 @@ export default function Register() {
         catch (error) {
             let msg;
             if(error.response.status==429){
-                msg="Slow down!"
+                msg=`${error.response.data}`
                 setRateLimited(true)
             }
             toast.error(msg || error.response.data.msg)
@@ -83,8 +83,12 @@ export default function Register() {
 
         }
         catch (error) {
-            if (error.response.status == 500) navigate("/ServerError")
-            toast.error(error.response.data.msg)
+            let msg;
+            if(error.response.status==429){
+                msg=`${error.response.data}`
+                setRateLimited(true)
+            }
+            toast.error(msg || error.response.data.msg)
         }
         finally{
             setLoading(false)
@@ -173,7 +177,7 @@ export default function Register() {
             }
             {
                 isRateLimited &&
-                <RateLimit/>
+                <RateLimit time={15}/>
             }
         </div>
     )

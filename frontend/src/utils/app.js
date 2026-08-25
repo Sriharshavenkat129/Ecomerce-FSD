@@ -19,15 +19,15 @@ app.interceptors.response.use(
     },
     async (error)=>{
         const originalRequest=error.config
-        if(error.response && error.response.status==401 && originalRequest._retry==false && originalRequest.headers.Authorization){
+        if(error.response && error.response.status==401 && !originalRequest._retry && originalRequest.headers.Authorization){
             originalRequest._retry=true
             const refreshToken=localStorage.getItem('refreshToken')
             if(refreshToken){
                 try{
                     const result=await app.post("/refresh",{refreshToken})
                     localStorage.setItem('accessToken',result.data.accessToken)
-                    originalRequest.headers.Authorization=`Bearer ${accessToken}`
-                    app(originalRequest)
+                    originalRequest.headers.Authorization=`Bearer ${result.data.accessToken}`
+                    return app(originalRequest)
                 }catch(error){
                     localStorage.removeItem('accessToken')
                     localStorage.removeItem('refreshToken')

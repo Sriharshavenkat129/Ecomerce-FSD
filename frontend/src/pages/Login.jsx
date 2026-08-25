@@ -31,7 +31,7 @@ export default function Login({ setUserType }) {
         catch (error) {
             if (error.response.status==429){
                 setRateLimited(true)
-                toast.error('Slow down!')
+                toast.error(error.response.data)
             }
             else
             toast.error(error.response?.data.msg || "something went wrong")
@@ -80,7 +80,7 @@ export default function Login({ setUserType }) {
             }
             {
                 isRateLimited &&
-                <RateLimit/>
+                <RateLimit time={15}/>
             }
         </div>
     )
