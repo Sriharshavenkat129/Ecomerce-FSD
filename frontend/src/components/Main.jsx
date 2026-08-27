@@ -7,7 +7,7 @@ import { useState ,useEffect} from "react"
 
 export default function Main({query,setQuery,products,setProducts}) {
     const [category, setCategory] = useState("")
-    const [loading,setLoading]=useState(false)
+    const [loading,setLoading]=useState(true)
     const [isRateLimited,setRateLimit]=useState(false)
     useEffect(()=>{
         async function getByCategory(){

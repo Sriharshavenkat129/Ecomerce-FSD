@@ -1,8 +1,11 @@
 import { Search, ShoppingBasket,  UserCircle2Icon } from "lucide-react";
 import app from "../utils/app";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 export default function Header({ query, setQuery, setProducts }) {
+    const navigate =useNavigate()
+
     const handleSearch=async ()=>{
         try{
             const response=await app.get("/user/products",{params:{"product_name":query.name}})
@@ -25,7 +28,7 @@ export default function Header({ query, setQuery, setProducts }) {
                 <button className="ml-auto mr-1 cursor-pointer" onClick={()=>{handleSearch()}}><Search size={20} /></button>
             </div>
             <div className="flex gap-4 mr-3 w-1/6 sm:w-2/6 justify-end">
-                <ShoppingBasket size={35} className="cursor-pointer" />
+                <ShoppingBasket size={35} className="cursor-pointer" onClick={()=>{navigate("/cart")}}/>
                 <UserCircle2Icon size={35} className="cursor-pointer" />
             </div>
         </header>

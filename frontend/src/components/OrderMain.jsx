@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import app from "../utils/app"
 import toast from "react-hot-toast";
 import RateLimit from "./RateLimit";
-import { useParams } from "react-router";
+import { useParams,useNavigate } from "react-router";
 import ProductOrderCard from "./ProductOrderCard";
 import AddressRadio from "./addressRadio";
 import AddAddress from "./AddAddress";
@@ -10,7 +10,7 @@ import OrderPlaced from "./orderPlaced";
 
 export default function OrderMain() {
     const [orderData, setOrderData] = useState({ "quantity": 1 })
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [timeout, setTimeOut] = useState(0)
     const [ordered, setOrdered] = useState(false);
     const [Addresses, setAddresses] = useState([]);
@@ -18,6 +18,7 @@ export default function OrderMain() {
     const [isRateLimited, setRateLimited] = useState(false)
     const [product, setProduct] = useState()
     const params = useParams()
+    const navigate=useNavigate()
 
     useEffect(() => {
         async function getAddresses() {
@@ -32,7 +33,7 @@ export default function OrderMain() {
                 }
                 if (error.response.staus == 429) {
                     setRateLimited(true)
-                    toast.error(error.response)
+                    toast.error(error.response.data)
                 }
                 else toast.error(error.response.data.msg)
             }
@@ -43,19 +44,7 @@ export default function OrderMain() {
         getAddresses()
     }, [])
 
-    useEffect(() => {
-        let intervalId;
-
-        if (ordered === true && timeout > 0) {
-            intervalId = setInterval(() => {
-                setTimeOut(pre => pre - 1);
-            }, 1000);
-        } else if (ordered === true && timeout === 0) {
-            setOrdered(false);
-        }
-        return () => clearInterval(intervalId);
-    }, [ordered, timeout]);
-
+    
     useEffect(() => {
         async function getProduct() {
             const product_id = useParams.product_id
@@ -67,9 +56,9 @@ export default function OrderMain() {
             catch (error) {
                 if (error.response.status == 429) {
                     setRateLimited(true)
-                    toast.error(error.response)
+                    toast.error(error.response.data)
                 }
-                else toast.error(error.response.data?.msg || "something went wrong")
+                else toast.error(error.response.data.msg || "something went wrong")
             }
             finally {
                 setLoading(false)
@@ -77,6 +66,20 @@ export default function OrderMain() {
         }
         getProduct()
     }, [])
+    
+    useEffect(() => {
+        let intervalId;
+
+        if (ordered === true && timeout > 0) {
+            intervalId = setInterval(() => {
+                setTimeOut(pre => pre - 1);
+            }, 1000);
+        } else if (ordered === true && timeout === 0) {
+            setOrdered(false);
+            navigate("/Home")
+        }
+        return () => clearInterval(intervalId);
+    }, [ordered, timeout]);
 
     const handleOrder = async () => {
         try {
@@ -87,7 +90,7 @@ export default function OrderMain() {
             }
             const response = await app.post("/user/products/order", { ...orderData, product_id: params.product_id })
             setOrdered(true)
-            setTimeOut(5)
+            setTimeOut(3)
         }
         catch (error) {
             toast.error(error.response.data.msg || "something went wrong!")
@@ -100,9 +103,9 @@ export default function OrderMain() {
     const addressCards = Addresses.map(address => <AddressRadio key={address.address_id} address={address} setAddressId={setOrderData} />)
 
 
-
     return (
         <main className="flex justify-center items-center min-h-screen">
+            {!isRateLimited && <>
             {(!loading && !ordered && !isRateLimited && product && !addAddressStatus) &&
                 <section className="flex flex-col gap-6 p-4 w-full max-w-md border border-gray-100 shadow-2xl rounded-xl">
                     <div>
@@ -147,16 +150,18 @@ export default function OrderMain() {
                 </section>
             }
             {
-                loading &&
+                (!isRateLimited && loading) &&
                 <div className="animate-pulse sise-20 rounded-xl bg-black"></div>
+            }
+            {
+                (addAddressStatus && !isRateLimited) &&
+                <AddAddress setAddAddressStatus={setAddAddressStatus} setAddresses={setAddresses} Addresses={Addresses} />
+            }
+            </>
             }
             {
                 isRateLimited &&
                 <RateLimit />
-            }
-            {
-                addAddressStatus &&
-                <AddAddress setAddAddressStatus={setAddAddressStatus} setAddresses={setAddresses} Addresses={Addresses} />
             }
         </main>
     )

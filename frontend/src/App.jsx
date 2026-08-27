@@ -6,6 +6,8 @@ import Register from "./pages/Register"
 import Order from "./pages/Order"
 import { useState } from "react"
 import Home from "./pages/Home"
+import Cart from "./pages/Cart"
+import OrderCart from "./pages/OrderCart"
 
 export default function App(){
     const [userType,setUserType]=useState("user")
@@ -18,6 +20,8 @@ export default function App(){
             <Route path="/register" element={<Register/>}></Route>
             <Route path="/Home" element={<Home/>}></Route>
             <Route path="/order/:product_id" element={<Order/>}></Route>
+            <Route path="/cart" element={<Cart/>}></Route>
+            <Route path='/cart/order' element={<OrderCart/>}></Route>
         </Routes>
         </>
     )

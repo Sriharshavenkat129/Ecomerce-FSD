@@ -1,18 +1,22 @@
 import { IndianRupee } from "lucide-react"
 import { useState } from "react"
-import { useNavigate } from "react-router"
-import app from "../utils/app.js"
 import toast from "react-hot-toast"
+import app from "../utils/app"
 
-export default function ProductCard({ product }) {
-    const navigate=useNavigate()
+export default function CartedProductCard({product,setCartedProducts}) {
     const [loading,setLoading]=useState(false)
-    const addToCart=async (product_id)=>{
+    const removeFromCart=async (cart_id)=>{
+        if(!cart_id)return toast.error("cart_id is required!")
         try{
-            if(!product_id)return toast.error("product_id required!")
             setLoading(true)
-            const response=await app.post("/user/products/cart",{product_id})
+            const response=await app.delete(`/user/me/cart/${cart_id}`)
             toast.success(response.data.msg)
+            setCartedProducts(pre=>{
+                const newproducts=pre.filter(p=>{
+                    return p.cart_id!=cart_id
+                })
+                return newproducts
+            })
         }
         catch(error){
             toast.error(error.response.data.msg || "something went wrong!")
@@ -22,17 +26,17 @@ export default function ProductCard({ product }) {
         }
     }
     return (
-        <div className="flex flex-col bg-white p-4 border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 w-full">
-            
+        <div className="flex flex-col bg-white p-4 border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 w-full grow-0">
+
             <div className="w-full h-56 rounded-xl overflow-hidden mb-4 bg-gray-50">
-                <img 
-                    src={product.product_image} 
+                <img
+                    src={product.product_image}
                     alt={product.product_name}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />
             </div>
-            
-            <div className="flex flex-col grow gap-2">
+
+            <div className="flex flex-col gap-2 grow-0 shrink-0">
                 <div className="flex justify-between items-start gap-2">
                     <h3 className="text-xl font-bold font-serif text-gray-900 truncate">
                         {product.product_name}
@@ -49,15 +53,15 @@ export default function ProductCard({ product }) {
                     {product.stock === 0 ? "Out of stock" : `Only ${product.stock} left in stock`}
                 </p>
             </div>
-            <div className="flex gap-3 mt-5 pt-4 border-t border-gray-100">
+            <div className="flex gap-3 mt-5 pt-4 border-t border-gray-100 grow-0">
                 <button className="flex-1 py-2.5 border-2 border-orange-500 text-orange-600 rounded-lg font-semibold hover:bg-orange-50 transition-colors cursor-pointer disabled:bg-orange-300"
-                disabled={loading}
-                onClick={()=>addToCart(product.product_id)}>
-                    Add to cart
+                    disabled={loading}
+                    onClick={() =>{removeFromCart(product.cart_id)}}>
+                    Remove from cart
                 </button>
                 <button className="flex-1 py-2.5 bg-orange-500 text-white rounded-lg font-semibold shadow-md hover:bg-orange-600 transition-colors cursor-pointer disabled:bg-orange-300"
-                onClick={()=>{navigate(`/order/${product.product_id}`)}}
-                disabled={product.stock==0}>
+                    onClick={() => { navigate(`/order/${product.product_id}`) }}
+                    disabled={product.stock == 0}>
                     Buy Now
                 </button>
             </div>
