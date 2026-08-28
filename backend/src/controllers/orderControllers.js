@@ -52,9 +52,8 @@ const getUserOrders=async (req,res,next)=>{
         return next({"status":400,"msg":"user details missing!"})
     try{
         const result=await pool.query("select o.order_id,o.status,o.quantity,o.unit_price,\
-            p.product_name,p.product_image,a.location,a.pincode,a.state from orders o\
+            p.product_name,p.product_image from orders o\
             left join products p on p.product_id=o.product_id\
-            left join addresses a on a.address_id=o.address_id\
             where o.user_id=$1",[req.user.user_id])
         if(result.rows.length==0)
             return next({"status":404,"msg":"no orders yet!"})
@@ -136,7 +135,7 @@ const cancelOrder=async (req,res,next)=>{
             if(transactionResult.rows[0].payment_status=="pending")
                 await con.query('update transactions set payment_status=$1 where transaction_id=$2',["cancelled",transaction_id])
             else
-                await con.query("update transactions set payment_status=$1 where transaction_id=$2",["refunded",transaction_id])
+                await con.query("update transactions set payment_status=$1,total_amount=$2 where transaction_id=$3",["refunded",quantity*orderResult.rows[0].unit_price,transaction_id])
         }
         else{
             await con.query("update products set stock=$1 where product_id=$2",
@@ -211,7 +210,7 @@ const returnOrder=async (req,res,next)=>{
             "returned",transactionDetails.rows[0].transaction_id,result.rows[0].unit_price])
         if(quantity<result.rows[0].quantity)await con.query('update orders set quantity=$1 where order_id=$2',[result.rows[0].quantity-quantity,order_id])
         await con.query('commit')
-        res.status(200).json("order returned successfully")
+        res.status(200).json({"msg":"order returned successfully"})
     }
     catch(error){
         if(con)
