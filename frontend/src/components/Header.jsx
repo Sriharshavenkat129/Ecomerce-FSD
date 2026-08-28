@@ -25,11 +25,11 @@ export default function Header({ query, setQuery, setProducts }) {
             <div className="m-auto flex gap-1 border-2 p-1 rounded-xl w-4/6 sm:w-3/6">
                 <input type="text" value={query.name} onChange={(e) => { setQuery(pre => ({ ...pre, "name": e.target.value })) }}
                     className="outline-none w-full text-balance font-semibold text-md pl-2"></input>
-                <button className="ml-auto mr-1 cursor-pointer" onClick={()=>{handleSearch()}}><Search size={20} /></button>
+                <button className="cursor-pointer ml-auto mr-1 cursor-pointer" onClick={()=>{handleSearch()}}><Search size={20} /></button>
             </div>
             <div className="flex gap-4 mr-3 w-1/6 sm:w-2/6 justify-end">
                 <ShoppingBasket size={35} className="cursor-pointer" onClick={()=>{navigate("/cart")}}/>
-                <UserCircle2Icon size={35} className="cursor-pointer" />
+                <UserCircle2Icon size={35} className="cursor-pointer" onClick={()=>navigate("/user/me")}/>
             </div>
         </header>
     )
