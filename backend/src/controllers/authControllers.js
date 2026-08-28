@@ -5,6 +5,7 @@ const jwt=require('jsonwebtoken')
 const mailer=require('../config/nodemailer.js')
 const { ref } = require('node:process')
 const { stat } = require('node:fs')
+const { retry } = require('@reduxjs/toolkit/query')
 
 const login=async (req,res,next)=>{
     const {email,password}=req.body
@@ -126,7 +127,7 @@ const sendPassWordResetOtp=async (req,res,next)=>{
         }
         const otp=Math.floor(100000+Math.random()*900000).toString()
         const otpToken=await jwt.sign({"user_id":result.rows[0].user_id,"otp":otp},
-            process.env.JWT_SECRET,{expiresIn:"5m"}
+            process.env.JWT_SECRET,{expiresIn:"5min"}
         )
         mailer.sendMail({
             from:process.env.EMAIL_USER,
@@ -162,6 +163,8 @@ const verifyPassWordResetOtp=async (req,res,next)=>{
 
 const resetPassword=async (req,res,next)=>{
     const {otpToken,new_password}=req.body
+    if(!otpToken)
+        return next({"status":400,"msg":"otp token required!"})
     try{
         const data=await jwt.verify(otpToken,process.env.JWT_SECRET)
         const newHashedPassword=await bcrypt.hash(new_password,10)
@@ -169,7 +172,7 @@ const resetPassword=async (req,res,next)=>{
         res.status(200).json({"msg":"password updated successfully"})
     }
     catch(error){
-        next({"status":401,"msg":"password updation failed"})
+        next({"status":500,"msg":"password updation failed"})
     }
 }
 

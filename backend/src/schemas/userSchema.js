@@ -43,7 +43,8 @@ const passwordValidator=z.object({
     .min(8,"password is too short")
     .regex(/[a-z]/,"password must contain one small letter")
     .regex(/[A-Z]/,"password must contain one capital letter")
-    .regex(/[0-9]/,"password must contain a digit")
+    .regex(/[0-9]/,"password must contain a digit"),
+    otpToken:z.string().optional()
 })
 
 module.exports={registerSchema,loginSchema,passwordSchema,addressSchema,emailValidator,passwordValidator}

@@ -3,7 +3,7 @@ const {sendPassWordResetOtp,verifyPassWordResetOtp,resetPassword}=require("../co
 const {registerSchema,loginSchema}=require('../schemas/userSchema.js')
 const {passwordValidator,emailValidator}=require("../schemas/userSchema.js")
 const validate=require("../middlewares/validationMiddleware.js")
-const {authLimiter}=require("../middlewares/rateLimiters.js")
+const {authLimiter,generalLimiter}=require("../middlewares/rateLimiters.js")
 
 const router=require('express').Router()
 
