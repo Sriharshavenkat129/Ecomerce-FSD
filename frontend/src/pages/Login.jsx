@@ -6,7 +6,7 @@ import toast from "react-hot-toast"
 import RateLimit from "../components/RateLimit"
 import { tr } from "framer-motion/client"
 
-export default function Login({ setUserType }) {
+export default function Login({setUserType }) {
     const [data, setData] = useState({
         "email": "",
         "password": ""
@@ -32,6 +32,7 @@ export default function Login({ setUserType }) {
     const hasSmall = /[a-z]/.test(resetData.new_password)
     const isValidPassword = hasCap && hasDigit && hasSmall
 
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!data.email || !data.password) {
@@ -44,7 +45,8 @@ export default function Login({ setUserType }) {
             localStorage.setItem('refreshToken', result.data.refreshToken)
             setUserType(result.data.userType)
             toast.success(result.data.msg)
-            navigate("/Home")
+            if(result.data.userType=="user")navigate("/Home")
+            else if(result.data.userType=="admin")navigate("/admin")
         }
         catch (error) {
             if (error.response.status == 429) {

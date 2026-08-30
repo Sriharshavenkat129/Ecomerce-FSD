@@ -63,6 +63,23 @@ export default function Profile() {
         fetchAllProfileData();
     }, []);
 
+    const handleLogout=()=>{
+        try{
+            setLoading(true)
+            localStorage.removeItem('accessToken')
+            localStorage.removeItem('refreshToken')
+            toast.success("Logout success")
+            navigate('/')
+        }
+        catch(error){
+            toast.error("something went wrong!")
+        }
+        finally{
+            setLoading(false)
+        }
+    }
+    console.log(loading)
+
     const orderProductCards = orders.map(order => <OrderProductCard order={order} key={order.order_id} />)
 
     return (
@@ -126,6 +143,15 @@ export default function Profile() {
                                                     onClick={() => setAddAddressStatus(true)}
                                                 >
                                                     + Add New Address
+                                                </button>
+                                            </div>
+                                            <div>
+                                                <button className="px-4 py-1 border-2 border-red-500 rounded-xl 
+                                                transition-all duration-300 ease-in-out hover:bg-red-200 text-md font-semibold
+                                                active:scale-98 active:bg-red-500 active:text-white cursor-pointer"
+                                                onClick={()=>handleLogout()}>
+                                                    {loading && <div className="animate-spin size-5 rounded-full border-4 border-gray-200 border-t-blue-500"></div>}
+                                                    {!loading &&<>Logout</>}
                                                 </button>
                                             </div>
                                         </div>

@@ -1,26 +1,9 @@
 import { IndianRupee } from "lucide-react"
 import { useState } from "react"
-import { useNavigate } from "react-router"
-import app from "../utils/app.js"
-import toast from "react-hot-toast"
 
 export default function ProductCard({ product }) {
-    const navigate=useNavigate()
     const [loading,setLoading]=useState(false)
-    const addToCart=async (product_id)=>{
-        try{
-            if(!product_id)return toast.error("product_id required!")
-            setLoading(true)
-            const response=await app.post("/user/products/cart",{product_id})
-            toast.success(response.data.msg)
-        }
-        catch(error){
-            toast.error(error.response.data.msg || "something went wrong!")
-        }
-        finally{
-            setLoading(false)
-        }
-    }
+
     return (
         <div className="flex flex-col bg-white p-4 border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 w-full">
             
@@ -50,15 +33,15 @@ export default function ProductCard({ product }) {
                 </p>
             </div>
             <div className="flex gap-3 mt-5 pt-4 border-t border-gray-100">
-                <button className="flex-1 py-2.5 border-2 border-orange-500 text-orange-600 rounded-lg font-semibold hover:bg-orange-50 transition-colors cursor-pointer disabled:bg-orange-300"
-                disabled={loading}
-                onClick={()=>addToCart(product.product_id)}>
-                    Add to cart
+                { product.is_available &&
+                <button className="flex-1 py-2.5 border-2 border-red-500 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition-colors cursor-pointer disabled:bg-red-300"
+                disabled={loading}>
+                    Remove product
                 </button>
+                }
                 <button className="flex-1 py-2.5 bg-orange-500 text-white rounded-lg font-semibold shadow-md hover:bg-orange-600 transition-colors cursor-pointer disabled:bg-orange-300"
-                onClick={()=>{navigate(`/order/${product.product_id}`)}}
                 disabled={product.stock==0}>
-                    Buy Now
+                    Manage product
                 </button>
             </div>
         </div>

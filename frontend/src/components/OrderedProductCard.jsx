@@ -28,7 +28,7 @@ export default function OrderedProductCard({ order }) {
                     </p>
                 </div>
             </div>
-            <div className="flex flex-col grow gap-2">
+            <div className="flex flex-col grow gap-2 mb-auto">
                 <div className="flex justify-between items-start gap-2">
                     <h3 className="text-xl font-bold font-serif text-gray-900 truncate">
                         Quantity:{order.quantity}

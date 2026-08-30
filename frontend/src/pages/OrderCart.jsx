@@ -81,7 +81,8 @@ export default function OrderCart() {
         try {
             setLoading(true)
             const response = await app.post("/user/me/cart/order", orderData)
-            console.log(response.data.msg)
+            toast.success(response.data.msg)
+            setOrderPlacingStatus(false)
         }
         catch (error) {
             if (error.response.status == 429) {

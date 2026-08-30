@@ -5,10 +5,9 @@ import { Menu, X } from "lucide-react"; // Using lucide-react for the hamburger 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    // Smooth scrolling function for your anchor links
     const handleScroll = (e, targetId) => {
         e.preventDefault();
-        setIsMenuOpen(false); // Close mobile menu if open
+        setIsMenuOpen(false); 
         const element = document.getElementById(targetId);
         if (element) {
             element.scrollIntoView({ behavior: "smooth" });
@@ -16,7 +15,6 @@ export default function Header() {
     };
 
     return (
-        // Added backdrop-blur-md for a modern "glassy" navbar effect
         <header className="shadow-sm fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md px-4 py-3 sm:px-8">
             <div className="flex items-center justify-between max-w-7xl mx-auto">
                 <div>

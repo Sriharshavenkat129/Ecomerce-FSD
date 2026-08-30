@@ -10,6 +10,8 @@ import Cart from "./pages/Cart"
 import OrderCart from "./pages/OrderCart"
 import Profile from "./pages/profile"
 import OrderDetail from "./pages/OrderDetail"
+import Admin from "./pages/Admin"
+import NewProduct from "./pages/NewProduct"
 
 export default function App(){
     const [userType,setUserType]=useState("user")
@@ -26,6 +28,8 @@ export default function App(){
             <Route path='/cart/order' element={<OrderCart/>}></Route>
             <Route path="/user/me" element={<Profile/>}></Route>
             <Route path="/user/me/order/:order_id" element={<OrderDetail/>}></Route>
+            <Route path="/admin" element={<Admin/>}></Route>
+            <Route path="admin/product/new" element={<NewProduct/>}></Route>
         </Routes>
         </>
     )
