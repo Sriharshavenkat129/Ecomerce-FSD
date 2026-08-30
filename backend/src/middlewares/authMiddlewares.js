@@ -4,7 +4,7 @@ require('dotenv').config()
 const userAuth=(req,res,next)=>{
     const header=req.headers.authorization;
     if(!header || !header.startsWith('Bearer'))
-        next({"status":400,"msg":"token required!"})
+        next({"status":401,"msg":"token required!"})
     try{
         const refreshToken=header.split(" ")[1]
         const data=jwt.verify(refreshToken,process.env.JWT_SECRET)

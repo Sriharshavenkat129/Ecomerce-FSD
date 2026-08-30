@@ -99,15 +99,14 @@ const orderAllFromCart = async (req, res, next) => {
                 throw new Error("unable to process the order")
             }
         }
-        const ordered_product_ids = `${orderedProducts.join(",")}`
-        await con.query('delete from carts where user_id=$1 and product_id in ($2)', [req.user.user_id, ordered_product_ids])
+        await con.query('delete from carts where user_id=$1 and product_id = ANY($2::uuid[])', [req.user.user_id, orderedProducts])
         await con.query('commit')
         res.status(201).json({ "msg": "order placed successfully" })
     }
     catch (error) {
         if (con)
             await con.query('rollback')
-        next({ "msg": 500, "msg": "unable to place the order" })
+        next({ "status": 500, "msg": "unable to place the order" })
     }
     finally {
         if (con)

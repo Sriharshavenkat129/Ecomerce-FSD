@@ -101,6 +101,12 @@ const updateProduct=async (req,res,next)=>{
     let values=[]
     let queries=[]
     let count=1
+    let imageUrl;
+    if(req.file.buffer){
+        imageUrl=await uploadToCloudinary(req.file.buffer)
+        values.push(imageUrl)
+        queries.push(`imageUrl=${count++}`)
+    }
     const allowedFields=['product_name','product_description','price','stock','category','is_available']
     for(const field of allowedFields){
         if(data[field]!=undefined){
