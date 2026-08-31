@@ -8,6 +8,7 @@ const {userAuth,adminAuth}=require("./middlewares/authMiddlewares.js")
 const {generalLimiter}=require("./middlewares/rateLimiters.js")
 
 const app=express()
+app.set('trust proxy', 1);
 
 app.use(express.json())
 app.use(cors())
