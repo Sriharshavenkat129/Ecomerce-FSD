@@ -2,10 +2,12 @@ import { useEffect, useState } from "react"
 import RateLimit from "../components/RateLimit"
 import app from "../utils/app"
 import toast from "react-hot-toast"
-import { ArrowLeft, ArrowLeftCircle, Package, PackageX, ShoppingCart } from "lucide-react"
+import { ArrowLeftCircle, Package, PackageX, ShoppingCart } from "lucide-react"
 import ProductCard from "../components/adminComponents/ProductCard"
 import OrderCard from "../components/adminComponents/OrderCard"
+import OrderDetail from "../components/adminComponents/OrderDetail"
 import { useNavigate } from "react-router"
+import ProductDetails from "../components/adminComponents/ProductDetails"
 
 export default function Admin() {
 
@@ -20,6 +22,8 @@ export default function Admin() {
     const [todaySales, setTodaySales] = useState()
     const [monthlySales, setMonthlySales] = useState()
     const [yearlySales, setYearlySales] = useState()
+    const [orderManagingId,setOrderManagingId] = useState("")
+    const [productmanagingId,setProductManagingId] = useState("")
 
     const values = ["Total orders", "Today", "This Month", "This Year"]
 
@@ -49,7 +53,6 @@ export default function Admin() {
 
             }
             catch (error) {
-                console.log(error)
                 if (error.response?.status == 429) {
                     setIsRateLimited(true)
                     return toast.error("too many requests")
@@ -104,11 +107,11 @@ export default function Admin() {
     )
 
     const productCards = products.map(pre => {
-        return <ProductCard product={pre} key={pre.product_id} />
+        return <ProductCard product={pre} key={pre.product_id} setProductManagingId={setProductManagingId} setProducts={setProducts}/>
     })
 
     const orderCards = orders.map(pre => {
-        return <OrderCard key={pre.order_id} order={pre}/>
+        return <OrderCard key={pre.order_id} order={pre} setOrderManagingId={setOrderManagingId}/>
     })
 
     return (
@@ -116,20 +119,19 @@ export default function Admin() {
             <div className="flex flex-col p-2 lg:flex-row gap-2 h-full">
 
 
-                <div className={`lg:w-2/3 h-full min-h-0 flex-col gap-2 ${mobileViewThing != "" ? 'flex' : 'hidden'} lg:flex`}>
+                <div className={`lg:w-2/3 h-full min-h-0 flex-col gap-2 ${mobileViewThing != "" ? 'flex' : 'hidden'} lg:flex overflow-auto scrollbar-none`}>
 
                     {mobileViewThing != "" && (
-                        <div className="p-2 flex-none lg:hidden">
+                        <div className={`p-2 flex-none lg:hidden ${orderManagingId?"hidden":productmanagingId?"hidden":""}`}>
                             <ArrowLeftCircle size={30}
                                 className="cursor-pointer transition-all duration-300 ease-in-out hover:scale-102"
                                 onClick={() => setMobileViewThing("")} />
                         </div>
                     )}
-
+                    { (!orderManagingId && ! productmanagingId) &&
                     <div className={`flex-1 min-h-0 p-2 border border-gray-100 rounded-xl shadow-inner bg-gray-50/50 grid grid-cols-1 
                         ${mobileViewThing == "products" ? (productCards.length == 0 ? 'lg:grid-cols-1' : "lg:grid-cols-2") : (orders.length == 0 ? "lg:grid-cols-1" : "lg:grid-cols-2")}
                         gap-3 overflow-y-auto scrollbar-none content-start`}>
-
                         {mobileViewThing == "products" && (
                             <>
                                 {productCards.length == 0 ? (
@@ -160,6 +162,19 @@ export default function Admin() {
                             </>
                         )}
                     </div>
+                    }
+                    {
+                        orderManagingId && 
+                        <>
+                            <OrderDetail order_id={orderManagingId} setOrderManagingId={setOrderManagingId} setOrders={setOrders}/>
+                        </>
+                    }
+                    {
+                        productmanagingId &&
+                        <>
+                            <ProductDetails productManagingId={productmanagingId} setProductManagingId={setProductManagingId} setProducts={setProducts}/>
+                        </>
+                    }
                 </div>
                 <div className={`lg:w-1/3 p-4 rounded-xl h-full flex-none overflow-y-auto scrollbar-none flex flex-col shadow-md border border-gray-200 ${mobileViewThing != "" ? 'hidden lg:flex' : 'flex'}`}>
                     <p className="text-2xl font-bold mb-4 text-center text-gray-800">Admin Dashboard</p>

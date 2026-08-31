@@ -1,10 +1,11 @@
-export default function OrderCard({ order }) {
+export default function OrderCard({ order ,setOrderManagingId }) {
     const orderDate = new Date(order.created_at).toLocaleDateString('en-IN', {
         year: 'numeric', month: 'short', day: 'numeric'
     });
     return (
         <div
-            className="flex flex-col gap-3 p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-300 transition-all duration-300 cursor-pointer h-full group">
+            className="flex flex-col gap-3 p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-300 transition-all duration-300 cursor-pointer h-full group"
+            onClick={()=>{setOrderManagingId(order.order_id)}}>
 
             <div className="flex justify-between items-start border-b border-gray-100 pb-3">
                 <div>

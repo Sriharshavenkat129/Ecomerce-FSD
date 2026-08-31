@@ -150,7 +150,7 @@ export default function Register() {
                 <div className="bg-gray-50 flex flex-col gap-2 rounded-md p-4 text-md w-xs">
                     <div>
                         <p>OTP sent to the following email</p>
-                        <p className="font-semibold -mt-1">{data.email}email</p>
+                        <p className="font-semibold -mt-1">{data.email}</p>
                     </div>
                     <div>
                         <form onSubmit={handleOTP}

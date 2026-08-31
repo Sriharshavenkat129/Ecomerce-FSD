@@ -78,7 +78,6 @@ export default function Profile() {
             setLoading(false)
         }
     }
-    console.log(loading)
 
     const orderProductCards = orders.map(order => <OrderProductCard order={order} key={order.order_id} />)
 

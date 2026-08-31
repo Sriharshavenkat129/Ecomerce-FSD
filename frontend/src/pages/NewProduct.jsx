@@ -36,14 +36,10 @@ export default function NewProduct() {
                 return toast.error("enter all fields")
             formData.append(field,newProduct[field])
         }
-        console.log(formData)
         try{
             setLoading(true)
             const response = await app.post("/admin/products",formData)
             toast.success(response.data.msg || "product created successfully🎉")
-            setTimeout(()=>
-            navigate(-1)
-            ,800)
         }
         catch(error){
             if(error.response?.status==429)
@@ -53,6 +49,7 @@ export default function NewProduct() {
         finally{
             setLoading(false)
         }
+        navigate(-1)
     }
 
     if(loading){
@@ -68,7 +65,7 @@ export default function NewProduct() {
 
     return (
         <div className="h-screen p-4 flex flex-col items-center justify-center">
-            <div className="w-auto p-4 border border-gray-100 rounded-xl shadow-md">
+            <div className=" p-4 border border-gray-100 rounded-xl shadow-md min-w-[400px] max-w-auto">
                 <div className="flex gap-2 items-center text-sm font-semibold">
                     <ArrowLeftCircle size={30} className="cursor-pointer mb-2 hover:scale-102 transition-all duration-300 ease-in-out mt-2"
                 onClick={()=>{navigate(-1)}}/>

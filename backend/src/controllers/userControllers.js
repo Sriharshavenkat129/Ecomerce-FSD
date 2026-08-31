@@ -37,7 +37,6 @@ const updateUserPassWord=async (req,res,next)=>{
         res.status(200).json({"msg":"password updated successfully"})
     }
     catch(error){
-        console.log(error)
         res.status(500).json({"msg":"password updation failed!"})
     }
 }
@@ -50,7 +49,6 @@ const addAddress=async (req,res,next)=>{
         res.status(200).json({"msg":"address added successfullt","data":result.rows[0]})
     }
     catch(error){
-        console.log(error)
         next({"msg":"adding address failed","status":500})
     }
 }

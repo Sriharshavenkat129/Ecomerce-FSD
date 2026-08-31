@@ -28,7 +28,6 @@ const getProductById=async (req,res,next)=>{
         res.status(200).json({"msg":"product fetched success","data":result.rows[0]})
     }
     catch(error){
-        console.log(error)
         next({"status":500,"msg":"failed to fetch data"})
     }
 }
@@ -73,7 +72,6 @@ const getProductsByQuery=async (req,res,next)=>{
         res.status(200).json({"msg":"products fecthed successfully","data":result.rows})
     }
     catch(error){
-        console.log(error)
         next(error)
     }
 }   
