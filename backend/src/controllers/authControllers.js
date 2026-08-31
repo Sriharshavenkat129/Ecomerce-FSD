@@ -48,16 +48,19 @@ const register=async (req,res,next)=>{
             otp
         }
         const otpToken=jwt.sign(user,process.env.JWT_SECRET,{expiresIn:'5m'})
+        console.log(process.env.EMAIL_USER)
         await mailer.sendMail({
             from:process.env.EMAIL_USER,
             to:email,
             subject:"your OTP for register",
             text:`DO NOT SHARE WITH ANYONE \n HERE IS YOU OTP FRO REGISTER :${otp}\n NOTE: EXPIRES IN 5 MINUTES`
         })
+        console.log(process.env.EMAIL_PASS)
         res.status(200).json({"status":200,"msg":"otp send success","otpToken":otpToken})
     }
     catch(error){
-        next(error)
+        console.log(error)
+        next({"status":500,"msg":"otp request failed!"})
     }
 }
 
