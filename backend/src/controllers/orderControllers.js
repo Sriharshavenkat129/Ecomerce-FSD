@@ -284,9 +284,9 @@ const getAllOrders=async (req,res,next)=>{
 const getOrderById=async (req,res,next)=>{
     const order_id=req.params.order_id
     try{
-        const result=await pool.query(" select p.product_name,p.product_image,o.unit_price,o.quantity,o.status,\
-            t.payment_type,t.payment_status,\
-            u.name,a.location,a.pincode,a.state from orders o\
+        const result=await pool.query("select p.product_name,p.product_image,o.order_id,o.unit_price,o.quantity,o.status,\
+            t.payment_type,t.payment_status,t.transaction_id,t.total_amount,\
+            u.name,u.email,a.location,a.pincode,a.state from orders o\
             left join products p on o.product_id=p.product_id\
             left join transactions t on t.transaction_id=o.transaction_id\
             left join addresses a on o.address_id=a.address_id\

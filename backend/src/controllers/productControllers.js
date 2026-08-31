@@ -3,6 +3,7 @@ const uploadToCloudinary = require('../config/cloudinary')
 const pool=require('../config/db')
 const { fi } = require('zod/v4/locales')
 const { stat } = require('node:fs')
+const e = require('express')
 
 const getAllProducts=async (req,res,next)=>{
     try{
@@ -101,11 +102,10 @@ const updateProduct=async (req,res,next)=>{
     let values=[]
     let queries=[]
     let count=1
-    let imageUrl;
-    if(req.file.buffer){
-        imageUrl=await uploadToCloudinary(req.file.buffer)
-        values.push(imageUrl)
-        queries.push(`imageUrl=${count++}`)
+    if(req.file?.buffer){
+        const product_image=await uploadToCloudinary(req.file.buffer)
+        values.push(product_image)
+        queries.push(`product_image=$${count++}`)
     }
     const allowedFields=['product_name','product_description','price','stock','category','is_available']
     for(const field of allowedFields){
