@@ -57,7 +57,7 @@ const register=async (req,res,next)=>{
         res.status(200).json({"status":200,"msg":"otp send success","otpToken":otpToken})
     }
     catch(error){
-        next(error)
+        next({"status":500,"msg":"otp request failed"})
     }
 }
 
