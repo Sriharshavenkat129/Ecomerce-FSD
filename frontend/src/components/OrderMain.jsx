@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import RateLimit from "./RateLimit";
 import { useParams,useNavigate } from "react-router";
 import ProductOrderCard from "./ProductOrderCard";
-import AddressRadio from "./addressRadio";
+import AddressRadio from "./AddressRadio";
 import AddAddress from "./AddAddress";
 import OrderPlaced from "./orderPlaced";
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import app from "../../utils/app.js";
+import app from "../../utils/app";
 import toast from "react-hot-toast";
 import RateLimit from "../../components/RateLimit.jsx";
 import { ArrowLeft, Package, MapPin, CreditCard, UserRoundCheck } from "lucide-react";

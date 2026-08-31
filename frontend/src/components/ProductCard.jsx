@@ -1,7 +1,7 @@
 import { IndianRupee } from "lucide-react"
 import { useState } from "react"
 import { useNavigate } from "react-router"
-import app from "../utils/app.js"
+import app from "../utils/app"
 import toast from "react-hot-toast"
 
 export default function ProductCard({ product }) {

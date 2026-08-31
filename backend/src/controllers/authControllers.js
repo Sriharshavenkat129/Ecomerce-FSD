@@ -1,11 +1,8 @@
-const { error } = require('node:console')
+
 const pool = require('../config/db.js')
 const bcrypt=require('bcryptjs')
 const jwt=require('jsonwebtoken')
 const mailer=require('../config/nodemailer.js')
-const { ref } = require('node:process')
-const { stat } = require('node:fs')
-const { retry } = require('@reduxjs/toolkit/query')
 
 const login=async (req,res,next)=>{
     const {email,password}=req.body

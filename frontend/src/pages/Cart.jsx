@@ -1,7 +1,7 @@
 import { ArrowLeft, ShoppingBasket, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import app from '../utils/app.js'
+import app from '../utils/app'
 import toast from "react-hot-toast";
 import CartedProductCard from "../components/CartedProductCard.jsx";
 

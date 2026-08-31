@@ -1,4 +1,4 @@
-const { error } = require("node:console")
+
 const pool = require("../config/db")
 
 const addProductIntoCart = async (req, res, next) => {

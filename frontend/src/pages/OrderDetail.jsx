@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import app from "../utils/app.js";
+import app from "../utils/app";
 import toast from "react-hot-toast";
 import RateLimit from "../components/RateLimit.jsx";
 import { ArrowLeft, Package, MapPin, CreditCard } from "lucide-react";

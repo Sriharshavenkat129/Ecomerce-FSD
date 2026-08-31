@@ -1,10 +1,10 @@
 import { ArrowLeft, IndianRupee, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import app from "../utils/app.js"
+import app from "../utils/app"
 import toast from "react-hot-toast";
 import ProductOrderCard from "../components/ProductOrderCard.jsx";
-import AddressRadio from "../components/addressRadio.jsx";
+import AddressRadio from "../components/AddressRadio.jsx";
 import AddAddress from "../components/AddAddress.jsx";
 import RateLimit from "../components/RateLimit.jsx";
 

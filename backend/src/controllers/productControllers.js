@@ -1,9 +1,6 @@
-const { image } = require('framer-motion/client')
+
 const uploadToCloudinary = require('../config/cloudinary')
 const pool=require('../config/db')
-const { fi } = require('zod/v4/locales')
-const { stat } = require('node:fs')
-const e = require('express')
 
 const getAllProducts=async (req,res,next)=>{
     try{

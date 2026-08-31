@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import app from "../utils/app.js"
+import app from "../utils/app"
 import toast from "react-hot-toast"
 import RateLimit from "../components/RateLimit.jsx"
 import OrderProductCard from "../components/OrderedProductCard.jsx"

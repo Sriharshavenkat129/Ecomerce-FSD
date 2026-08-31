@@ -1,4 +1,4 @@
-import { image } from "framer-motion/client"
+
 import { ArrowLeftCircle, ImageUpIcon } from "lucide-react"
 import { useState } from "react"
 import toast from "react-hot-toast"
