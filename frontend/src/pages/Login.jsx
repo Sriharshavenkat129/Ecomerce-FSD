@@ -4,7 +4,6 @@ import { useState } from "react"
 import app from "../utils/app"
 import toast from "react-hot-toast"
 import RateLimit from "../components/RateLimit"
-import { tr } from "framer-motion/client"
 
 export default function Login({setUserType }) {
     const [data, setData] = useState({
@@ -49,9 +48,9 @@ export default function Login({setUserType }) {
             else if(result.data.userType=="admin")navigate("/admin")
         }
         catch (error) {
-            if (error.response.status == 429) {
+            if (error.response?.status == 429) {
                 setRateLimited(true)
-                toast.error(error.response.data)
+                toast.error(error.response?.data)
             }
             else
                 toast.error(error.response?.data.msg || "something went wrong")
