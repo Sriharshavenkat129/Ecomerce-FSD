@@ -48,7 +48,7 @@ const register=async (req,res,next)=>{
             otp
         }
         const otpToken=jwt.sign(user,process.env.JWT_SECRET,{expiresIn:'5m'})
-        mailer.sendMail({
+        await mailer.sendMail({
             from:process.env.EMAIL_USER,
             to:email,
             subject:"your OTP for register",
