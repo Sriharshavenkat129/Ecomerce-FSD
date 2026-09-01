@@ -3,7 +3,7 @@ const { Resend } = require('resend');
 const pool = require('../config/db.js')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const mailer = require('../config/nodemailer.js')
+const sendOtpEmail = require('../config/nodemailer.js')
 
 const login = async (req, res, next) => {
     const { email, password } = req.body
@@ -51,12 +51,7 @@ const register = async (req, res, next) => {
             otp
         }
         const otpToken = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '5m' })
-        await mailer.sendMail({
-            from: `"Ecommerce-FSD" <${process.env.EMAIL_USER}>`,
-            to: email,
-            subject: "your OTP for register",
-            text: `DO NOT SHARE WITH ANYONE \n HERE IS YOU OTP FRO REGISTER :${otp}\n NOTE: EXPIRES IN 5 MINUTES`
-        })
+        await sendOtpEmail(email,otp)
 
 
         //         const resend = new Resend(process.env.RESEND_API_KEY);
