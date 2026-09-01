@@ -51,21 +51,28 @@ const register = async (req, res, next) => {
             otp
         }
         const otpToken = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '5m' })
-        // await mailer.sendMail({
-        //     from:process.env.EMAIL_USER,
-        //     to:email,
-        //     subject:"your OTP for register",
-        //     text:`DO NOT SHARE WITH ANYONE \n HERE IS YOU OTP FRO REGISTER :${otp}\n NOTE: EXPIRES IN 5 MINUTES`
-        // })
-
-        const resend = new Resend(process.env.RESEND_API_KEY);
-
-        await resend.emails.send({
-            from: 'onboarding@resend.dev',
+        await mailer.sendMail({
+            from: `"Ecommerce-FSD" <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: 'Your OTP for Register',
-            text: `DO NOT SHARE WITH ANYONE \n HERE IS YOUR OTP FOR REGISTER: ${otp}\n NOTE: EXPIRES IN 5 MINUTES`
-        });
+            subject: "your OTP for register",
+            text: `DO NOT SHARE WITH ANYONE \n HERE IS YOU OTP FRO REGISTER :${otp}\n NOTE: EXPIRES IN 5 MINUTES`
+        })
+
+
+        //         const resend = new Resend(process.env.RESEND_API_KEY);
+
+        //         const { data, error } = await resend.emails.send({
+        //     from: 'onboarding@resend.dev',
+        //     to: email,
+        //     subject: 'Your OTP for Register',
+        //     text: `DO NOT SHARE WITH ANYONE \n HERE IS YOUR OTP FOR REGISTER: ${otp}\n NOTE: EXPIRES IN 5 MINUTES`
+        // });
+
+        // if (error) {
+        //     console.log('Resend error:', error);
+        //     return next({ "status": 500, "msg": "otp request failed" });
+        // }
+
         res.status(200).json({ "status": 200, "msg": "otp send success", "otpToken": otpToken })
     }
     catch (error) {

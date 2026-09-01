@@ -135,10 +135,10 @@ export default function Register() {
                             }
                         </label>
                         <div className="ml-auto">
-                            <button type="submit" disabled={!isValidPassword || data.email.length<5 || data.name.length<1}
+                            <button type="submit" disabled={!isValidPassword || data.email.length<5 || data.name.length<1 || loading}
                             className="bg-blue-500 text-white text-md font-semibold cursor-pointer w-24 px-2 py-1 rounded-md
                             transition-all ease-in-out duration-300 hover:bg-blue-600 active:scale-95
-                            disabled:bg-blue-200">Register</button>
+                            disabled:bg-blue-200">{loading?"processing...":"Register"}</button>
                         </div>
                     </form>
                     <div className="mt-4">
@@ -164,7 +164,7 @@ export default function Register() {
                             <button type="submit" disabled={otp.length!=6 || loading}
                             className="bg-orange-400 px-4 py-1 font-semibold text-md rounded-md cursor-pointer
                             hover:bg-orange-500 active:scale-95 transition-all ease-in-out duration-300
-                            disabled:bg-orange-200">Verify</button>
+                            disabled:bg-orange-200">{loading?"Processing...":"Verify"}</button>
                         </form>
                         <div>
                             <p className="mt-4 text-md">{otpTimer !=0? `you can send otp in ${otpTimer}sec`:
