@@ -55,7 +55,9 @@ export default function Main({query,setQuery,products,setProducts}) {
         }
         getAllProducts()
     },[])
+
     const productCards=products.map(p=>{
+        if(!p.is_available) return
         return <ProductCard
         key={p.product_id}
         product={p}

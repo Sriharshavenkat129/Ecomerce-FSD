@@ -15,9 +15,9 @@ export default function OrderCard({ order ,setOrderManagingId }) {
                     <p className="text-xs text-gray-500">{orderDate}</p>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                    order.status === 'shipped' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
+                    order.status === 'created' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
                     }`}>
-                    {order.status || 'Pending'}
+                    {order.status || 'created'}
                 </span>
             </div>
 

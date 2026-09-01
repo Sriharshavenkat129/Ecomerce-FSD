@@ -6,12 +6,10 @@ import { useParams,useNavigate } from "react-router";
 import ProductOrderCard from "./ProductOrderCard";
 import AddressRadio from "./AddressRadio";
 import AddAddress from "./AddAddress";
-import OrderPlaced from "./orderPlaced";
 
 export default function OrderMain() {
     const [orderData, setOrderData] = useState({ "quantity": 1 })
     const [loading, setLoading] = useState(true);
-    const [timeout, setTimeOut] = useState(0)
     const [ordered, setOrdered] = useState(false);
     const [Addresses, setAddresses] = useState([]);
     const [addAddressStatus, setAddAddressStatus] = useState(false);
@@ -67,19 +65,6 @@ export default function OrderMain() {
         getProduct()
     }, [])
     
-    useEffect(() => {
-        let intervalId;
-
-        if (ordered === true && timeout > 0) {
-            intervalId = setInterval(() => {
-                setTimeOut(pre => pre - 1);
-            }, 1000);
-        } else if (ordered === true && timeout === 0) {
-            setOrdered(false);
-            navigate("/Home")
-        }
-        return () => clearInterval(intervalId);
-    }, [ordered, timeout]);
 
     const handleOrder = async () => {
         try {
@@ -89,8 +74,8 @@ export default function OrderMain() {
                 return
             }
             const response = await app.post("/user/products/order", { ...orderData, product_id: params.product_id })
-            setOrdered(true)
-            setTimeOut(3)
+            toast.success(response.data.msg)
+            navigate(-1)
         }
         catch (error) {
             toast.error(error.response.data.msg || "something went wrong!")
@@ -142,11 +127,6 @@ export default function OrderMain() {
                 cursor-pointer transition-all duration-300 ease-in-out active:scale-99 active:bg-orange-400" onClick={() => handleOrder()}>
                         Place Order
                     </button>
-                </section>
-            }
-            {(!loading && ordered && !isRateLimited) &&
-                <section>
-                    <OrderPlaced />
                 </section>
             }
             {

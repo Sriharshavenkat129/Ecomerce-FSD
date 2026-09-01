@@ -82,6 +82,7 @@ export default function OrderCart() {
             setLoading(true)
             const response = await app.post("/user/me/cart/order", orderData)
             toast.success(response.data.msg)
+            setProducts([])
             setOrderPlacingStatus(false)
         }
         catch (error) {

@@ -39,6 +39,7 @@ export default function OrderDetails() {
         try{
             setLoading(true)
             const response=await app.patch("/user/me/orders/paynow",{"order_id":order_id})
+            setOrder(pre=>({...pre,payment_status:"completed"}))
             toast.success(response.data.msg)
         }
         catch(error){
