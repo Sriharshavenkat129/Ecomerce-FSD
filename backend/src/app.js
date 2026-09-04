@@ -19,6 +19,9 @@ app.use(generalLimiter)
 app.use("/api/v1",authRouter)
 app.use("/api/v1/user",userAuth,userRouter)
 app.use("/api/v1/admin",userAuth,adminAuth,adminRouter)
+app.get("/ping",(req,res)=>{
+    res.status(200).send("server is alive")
+})
 
 app.use(globalMiddleware)
 

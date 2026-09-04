@@ -60,7 +60,6 @@ const getUserOrders=async (req,res,next)=>{
         res.status(200).json({"msg":"orders fetched successfully","data":result.rows})
     }
     catch(error){
-        console.log(error)
         next({"status":500,"msg":"something went wrong"})
     }
 }
@@ -321,7 +320,6 @@ const completeOrder=async (req,res,next)=>{
     catch(error){
         if(con)
             await con.query('rollback')
-        console.log(error)
         next({"status":500,"msg":"unable to deliver the order"})
     }
     finally{
